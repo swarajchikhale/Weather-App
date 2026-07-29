@@ -2,91 +2,422 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Weather App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Get real-time weather details including temperature, pressure, humidity, and coordinates for any city worldwide.">
+  <title>SkyFlow | Responsive Weather App</title>
+  
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+
   <style>
+    :root {
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.18);
+      --glass-hover: rgba(255, 255, 255, 0.15);
+      --text-main: #ffffff;
+      --text-muted: rgba(255, 255, 255, 0.7);
+    }
+
     body {
-      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #764ba2 100%);
       min-height: 100vh;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: #333;
+      font-family: 'Inter', sans-serif;
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow-x: hidden;
     }
-    nav {
-      background: #007bff;
-      color: white;
-      padding: 15px 0;
+
+    h1, h2, h3, h4, .temp-val {
+      font-family: 'Outfit', sans-serif;
     }
-    nav h1 {
-      margin: 0;
-      font-weight: bold;
-      text-transform: capitalize;
+
+    /* Navbar styling */
+    .navbar-glass {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 1rem 0;
     }
-    .search-box {
-      margin-top: 50px;
+
+    .brand-title {
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      font-size: 1.75rem;
+      background: linear-gradient(to right, #ffffff, #dcd6f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    .weather-card {
-      margin-top: 30px;
+
+    /* Main Container spacing */
+    .main-content {
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      padding: 3rem 0;
+    }
+
+    /* Search bar styles */
+    .search-container {
+      margin-bottom: 2.5rem;
+    }
+
+    .search-input-group {
+      background: var(--glass-bg);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid var(--glass-border);
+      border-radius: 50px;
+      padding: 6px;
+      transition: all 0.3s ease;
+    }
+
+    .search-input-group:focus-within {
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .search-input-group input {
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      padding-left: 1.5rem;
+      font-size: 1.1rem;
+    }
+
+    .search-input-group input:focus {
+      background: transparent;
+      outline: none;
+      box-shadow: none;
+      color: var(--text-main);
+    }
+
+    .search-input-group input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .btn-search {
+      background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 10px 24px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .btn-search:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 114, 255, 0.4);
+      color: #fff;
+    }
+
+    .btn-search:active {
+      transform: translateY(0);
+    }
+
+    /* Glass Card styles */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 28px;
+      padding: 2.5rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Error Alert styling */
+    .glass-alert {
+      background: rgba(220, 53, 69, 0.15);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(220, 53, 69, 0.3);
+      color: #ff9494;
       border-radius: 20px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+      padding: 1.25rem;
     }
-    .weather-card h3 {
-      font-weight: bold;
+
+    /* Weather details classes */
+    .weather-header {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .location-title {
+      font-size: 2.25rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    .coords-text {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      letter-spacing: 0.5px;
+    }
+
+    .weather-main {
+      padding: 1rem 0;
+    }
+
+    .temp-display {
+      position: relative;
+      margin: 1.5rem 0;
+    }
+
+    .temp-val {
+      font-size: 5rem;
+      font-weight: 800;
+      line-height: 1;
+      display: inline-block;
+    }
+
+    .temp-unit {
+      font-size: 2rem;
+      vertical-align: top;
+      font-weight: 600;
+      color: #00c6ff;
+    }
+
+    /* Custom unit switcher toggles */
+    .unit-switch {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--glass-border);
+      border-radius: 30px;
+      padding: 3px;
+      display: inline-flex;
+    }
+
+    .unit-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 6px 16px;
+      border-radius: 25px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .unit-btn.active {
+      background: var(--text-main);
+      color: #1e3c72;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .weather-icon-large {
+      font-size: 4.5rem;
+      background: linear-gradient(135deg, #ffdb01 0%, #e14a1d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-item {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 1.25rem;
+      text-align: center;
+      transition: background 0.3s ease;
+    }
+
+    .detail-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .detail-icon {
+      font-size: 1.75rem;
+      color: #00c6ff;
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-label {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.25rem;
+    }
+
+    .detail-val {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    /* Footer styling */
+    footer {
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 1.5rem 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    footer a {
+      color: #00c6ff;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    footer a:hover {
+      color: #ffffff;
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
-  <!-- Navbar -->
-  <nav class="text-center">
-    <h1>Weather App</h1>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-glass">
+    <div class="container justify-content-center">
+      <span class="brand-title"><i class="bi bi-cloud-sun-fill me-2"></i>SkyFlow</span>
+    </div>
   </nav>
 
-  <!-- Search Box -->
-  <div class="container search-box">
-    <div class="row justify-content-center">
-      <div class="col-md-6">
-        <form method="post" class="input-group">
-          <input type="text" class="form-control form-control-lg" name="city" placeholder="Enter city name" required>
-          <button class="btn btn-primary btn-lg" type="submit">
-            <i class="bi bi-search"></i> Search
-          </button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Weather Result -->
-  <div class="container">
-    {% if data.country_code and data.coordinate and data.temp and data.pressure and data.humidity %}
-    <div class="row justify-content-center">
-      <div class="col-md-6">
-        <div class="card weather-card text-center p-4">
-          <h3>{{data.cityname}}, {{data.country_code}}</h3>
-          <p class="text-muted">Coordinates: {{data.coordinate}}</p>
-          <hr>
-          <div class="row">
-            <div class="col-6">
-              <h5>Temperature</h5>
-              <p>{{data.temp}} ({{data.temp_cel}})</p>
-            </div>
-            <div class="col-6">
-              <h5>Pressure</h5>
-              <p>{{data.pressure}} hPa</p>
-            </div>
-            <div class="col-6">
-              <h5>Humidity</h5>
-              <p>{{data.humidity}}%</p>
-            </div>
-          </div>
+  <!-- Main Area -->
+  <main class="main-content">
+    <div class="container">
+      
+      <!-- Search Form -->
+      <div class="row justify-content-center search-container">
+        <div class="col-md-6 col-lg-5">
+          <form method="post" action="/" class="search-input-group d-flex align-items-center">
+            <input type="text" class="form-control" id="city-input" name="city" placeholder="Search for a city..." required autocomplete="off">
+            <button class="btn btn-search" id="search-btn" type="submit">
+              <i class="bi bi-search me-1"></i> Search
+            </button>
+          </form>
         </div>
       </div>
-    </div>
-    {% endif %}
-  </div>
 
-  <!-- Bootstrap 5 JS -->
+      <!-- Result Banner or Cards -->
+      <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+
+          <!-- Error Message Banner -->
+          {% if error %}
+          <div class="glass-alert text-center shadow-lg" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-3 d-block mb-2"></i>
+            <h5 class="alert-heading font-weight-bold">City Not Found</h5>
+            <p class="mb-0">{{ error }}</p>
+          </div>
+          {% elif city_name %}
+
+          <!-- Weather Info Display Card -->
+          <div class="glass-card text-center shadow-lg">
+            
+            <!-- Card Header details -->
+            <div class="weather-header">
+              <h2 class="location-title" id="location-name">{{ city_name }}, {{ country }}</h2>
+              <div class="coords-text">
+                <i class="bi bi-geo-alt-fill me-1 text-danger"></i>
+                Lat: <span id="lat-val">{{ coord_lat }}</span> • Lon: <span id="lon-val">{{ coord_lon }}</span>
+              </div>
+            </div>
+
+            <!-- Weather Primary Section -->
+            <div class="weather-main">
+              <div class="weather-icon-large">
+                <i class="bi bi-cloud-sun-fill"></i>
+              </div>
+              
+              <!-- Temp Reading with unit switches -->
+              <div class="temp-display">
+                <!-- Celsius display -->
+                <div id="temp-c-container" class="d-inline-block">
+                  <span class="temp-val">{{ temp_celsius }}</span><span class="temp-unit">°C</span>
+                </div>
+                <!-- Kelvin display (initially hidden) -->
+                <div id="temp-k-container" class="d-none">
+                  <span class="temp-val">{{ temp_kelvin }}</span><span class="temp-unit">K</span>
+                </div>
+              </div>
+
+              <!-- Unit Selector -->
+              <div class="unit-switch mb-4">
+                <button type="button" class="unit-btn active" id="btn-unit-c" onclick="switchUnit('C')">Celsius</button>
+                <button type="button" class="unit-btn" id="btn-unit-k" onclick="switchUnit('K')">Kelvin</button>
+              </div>
+            </div>
+
+            <!-- Secondary Weather Metrics -->
+            <div class="row g-3">
+              <!-- Humidity Card -->
+              <div class="col-6">
+                <div class="detail-item">
+                  <i class="bi bi-droplet-half detail-icon"></i>
+                  <div class="detail-label">Humidity</div>
+                  <div class="detail-val" id="humidity-val">{{ humidity }}%</div>
+                </div>
+              </div>
+              <!-- Pressure Card -->
+              <div class="col-6">
+                <div class="detail-item">
+                  <i class="bi bi-speedometer detail-icon"></i>
+                  <div class="detail-label">Pressure</div>
+                  <div class="detail-val" id="pressure-val">{{ pressure }} hPa</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          {% endif %}
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-center">
+    <div class="container">
+      <p class="mb-1">&copy; 2026 SkyFlow. Designed for modern web environments.</p>
+      <p class="mb-0">Powered by <a href="https://openweathermap.org/" target="_blank" rel="noopener noreferrer">OpenWeatherMap API</a></p>
+    </div>
+  </footer>
+
+  <!-- Bootstrap 5 JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Client-side Temperature Toggle Script -->
+  <script>
+    function switchUnit(unit) {
+      const cContainer = document.getElementById('temp-c-container');
+      const kContainer = document.getElementById('temp-k-container');
+      const btnC = document.getElementById('btn-unit-c');
+      const btnK = document.getElementById('btn-unit-k');
+
+      if (unit === 'C') {
+        cContainer.classList.remove('d-none');
+        kContainer.classList.add('d-none');
+        btnC.classList.add('active');
+        btnK.classList.remove('active');
+      } else {
+        cContainer.classList.add('d-none');
+        kContainer.classList.remove('d-none');
+        btnC.classList.remove('active');
+        btnK.classList.add('active');
+      }
+    }
+  </script>
 </body>
 </html>
